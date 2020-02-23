@@ -29,6 +29,7 @@ type Player struct {
 	Name string
 	Dices []int
 	DicesCount int
+	isEliminated bool
 
 }
 
@@ -119,6 +120,14 @@ func checkBet(lastBet Bet, newBet Bet) error{
 		return nil
 	}
 	return errors.New("Incorrect Bet")
+}
+
+func playRound(){
+	var playerBet Bet
+	for playerBet != {-1,-1}{
+		
+	}
+
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
