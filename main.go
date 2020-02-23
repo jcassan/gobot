@@ -8,17 +8,27 @@ import (
 	"syscall"
 	"github.com/jinzhu/gorm"
   _ "github.com/jinzhu/gorm/dialects/sqlite"
+	"flag"
+	"sort"
+	"math/rand"
 )
 
 // Variables used for command line parameters
-const Token string = "NjgwNDY3ODE4MzQwNTQ4Njkw.XlFMww.ECWMKxhcvS6OMfOyjiAsxLs3Ieg"
+var Token string
 
+func init() {
+	flag.StringVar(&Token, "t", "", "Bot Token")
+	flag.Parse()
+	fmt.Println(Token)
+}
 // Generic types for Perudooooooooo 
 type Player struct {
 	gorm.Model
 	ID string
 	Name string
 	Dices []int
+	DicesCount int
+
 }
 
 type Bet struct {
@@ -75,8 +85,26 @@ func main() {
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the autenticated bot has access to.
 
-func createGame(){
+func rollDices(players []Player){
+	for i:=0; i < len(players); i++ {
 
+		players[i].Dices=make([]int, players[i].DicesCount)
+		for j:=0; j < players[i].DicesCount; j++ {
+			players[i].Dices[j]=rand.Intn(5)+1
+		}
+	}
+}
+
+func createGame(players []Player){
+	sort.Slice(players, func(i, j int) bool {
+		return players[i].Name < players[j].Name
+	})
+	var game = Game{
+		Players: players,
+		LastBet: Bet{0, 0},		
+	}
+	game.CurrentPlayer=game.Players[0]
+	rollDices(game.Players)
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
