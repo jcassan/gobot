@@ -12,10 +12,8 @@ func TestCreateGame(t *testing.T) {
 		{Name: "Tata1"},
 		{Name: "Tata2"},
 	}
-	var game = perudo.CreateGame(players)
+	var game, player = perudo.CreateGame(players)
 	if len(game.Players) != 4 {
 		t.Errorf("Player count invalid. Actual value : %d, Expected value : 4.", len(game.Players))
-	} else {
-		t.Log("Player count valid")
 	}
 }

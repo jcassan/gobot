@@ -11,10 +11,10 @@ import (
 // Generic types for Perudooooooooo 
 type Player struct {
 	gorm.Model
-	ID         int
-	Name       string
-	Dices      []int
-	DicesCount int
+	ID           int
+	Name         string
+	Dices        []int
+	DicesCount   int
 	IsEliminated bool
 }
 
@@ -53,7 +53,7 @@ func CreateGame(players []Player) (Game, Player) {
 	game.CurrentPlayer = game.Players[0]
 	RollDices(game.Players)
 	for i := 0; i < len(game.Players); i++ {
-		game.Players[i].ID=i+1
+		game.Players[i].ID = i + 1
 	}
 	return game, game.Players[0]
 }
@@ -71,15 +71,15 @@ func CheckBet(lastBet Bet, newBet Bet) error {
 	return errors.New("Incorrect Bet")
 }
 
-func getPreviousPlayer(players []Player, currentPlayer Player) Player{
+func getPreviousPlayer(players []Player, currentPlayer Player) Player {
 	var index = FindPlayerIndex(players, currentPlayer)
 	var found bool = false
 	var i = index - 1
 	for found != true && i != index {
-		if (i < 0) {
+		if i < 0 {
 			i = len(players)
 		}
-		if (players[i].IsEliminated == false) {
+		if players[i].IsEliminated == false {
 			found = true
 		} else {
 			i--
@@ -88,12 +88,12 @@ func getPreviousPlayer(players []Player, currentPlayer Player) Player{
 	return players[i]
 }
 
-func getNextPlayer(players []Player, currentPlayer Player) Player{
+func getNextPlayer(players []Player, currentPlayer Player) Player {
 	var index = FindPlayerIndex(players, currentPlayer)
 	var found bool = false
-	var i = (index+1) % len(players)
-	for found != true && (i % len(players)) != index {
-		if (players[i].IsEliminated == false) {
+	var i = (index + 1) % len(players)
+	for found != true && (i%len(players)) != index {
+		if players[i].IsEliminated == false {
 			found = true
 		} else {
 			i++
@@ -103,19 +103,19 @@ func getNextPlayer(players []Player, currentPlayer Player) Player{
 }
 
 //return the player who lost the round
-func endRound(game Game) Player{
+func endRound(game Game) Player {
 	//Count total number of DiceValue in the round
 	var DiceCounter int = 0
-	for i:=0 ; i < len(game.Players) ; i++{
-		if (game.Players[i].IsEliminated == false){
-			for j:=0 ; j < game.Players[i].DicesCount; j++{
-				if (game.LastBet.DiceValue == game.Players[i].Dices[j]){
+	for i := 0; i < len(game.Players); i++ {
+		if game.Players[i].IsEliminated == false {
+			for j := 0; j < game.Players[i].DicesCount; j++ {
+				if game.LastBet.DiceValue == game.Players[i].Dices[j] {
 					DiceCounter++
 				}
 			}
 		}
 	}
-	if game.LastBet.DiceOccurence > DiceCounter{
+	if game.LastBet.DiceOccurence > DiceCounter {
 		return game.CurrentPlayer
 	}
 	return getPreviousPlayer(game.Players, game.CurrentPlayer)
@@ -127,27 +127,26 @@ Return true and the player who lost if a player said stop,
 Return false and the next Player if the bets continue
 Return true and the player who bet if the bet was invalid
 */
-func PlayRound(game Game, bet Bet) (bool, Player, error){
-	if (bet.DiceOccurence==-1 && bet.DiceValue==-1){
-		return true ,endRound(game), nil
+func PlayRound(game Game, bet Bet) (bool, Player, error) {
+	if bet.DiceOccurence == -1 && bet.DiceValue == -1 {
+		return true, endRound(game), nil
 	}
 	err := CheckBet(game.LastBet, bet)
 	if err != nil {
-		game.LastBet=bet
-		game.CurrentPlayer=getNextPlayer(game.Players, game.CurrentPlayer)
+		game.LastBet = bet
+		game.CurrentPlayer = getNextPlayer(game.Players, game.CurrentPlayer)
 		return false, game.CurrentPlayer, nil
-	} else{
+	} else {
 		return true, game.CurrentPlayer, err
 	}
 
 }
 
-
 func FindPlayerIndex(players []Player, p Player) int {
-    for i, n := range players {
-        if p.ID == n.ID {
-            return i
-        }
-    }
-    return -1
+	for i, n := range players {
+		if p.ID == n.ID {
+			return i
+		}
+	}
+	return -1
 }
