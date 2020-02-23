@@ -11,10 +11,11 @@ import (
 // Generic types for Perudooooooooo 
 type Player struct {
 	gorm.Model
-	ID         string
+	ID         int
 	Name       string
 	Dices      []int
 	DicesCount int
+	IsEliminated bool
 }
 
 type Bet struct {
@@ -52,7 +53,7 @@ func RollDices(players []Player) {
 	}
 }
 
-func CreateGame(players []Player) Game {
+func CreateGame(players []Player) (Game, Player) {
 	sort.Slice(players, func(i, j int) bool {
 		return players[i].Name < players[j].Name
 	})
@@ -62,7 +63,10 @@ func CreateGame(players []Player) Game {
 	}
 	game.CurrentPlayer = game.Players[0]
 	RollDices(game.Players)
-	return game
+	for i := 0; i < len(game.Players); i++ {
+		game.Players[i].ID=i+1
+	}
+	return game, game.Players[0]
 }
 
 func CheckBet(lastBet Bet, newBet Bet) error {
@@ -78,12 +82,67 @@ func CheckBet(lastBet Bet, newBet Bet) error {
 	return errors.New("Incorrect Bet")
 }
 
-func PlayRound() {
-	var playerBet Bet
-	for playerBet != {
-		-1, -1
+func getPreviousPlayer(players []Player, currentPlayer Player) Player{
+	var index = FindPlayerIndex(players, currentPlayer)
+	var found bool = false
+	var i = index - 1
+	for found != true && i != index {
+		if (i < 0) {
+			i = len(players)
+		}
+		if (players[i].IsEliminated == false) {
+			found = true
+		} else {
+			i--
+		}
 	}
-	{
+	return players[i]
+}
 
+func getNextPlayer(players []Player, currentPlayer Player) Player{
+	var index = FindPlayerIndex(players, currentPlayer)
+	var found bool = false
+	var i = (index+1) % len(players)
+	for found != true && (i % len(players)) != index {
+		if (players[i].IsEliminated == false) {
+			found = true
+		} else {
+			i++
+		}
 	}
+	return players[i]
+}
+
+func endRound(currentPlayer Player, previousPlayer Player) Player{
+	return currentPlayer
+}
+
+/*
+PlayRound
+Return true and the player who lost if a player said stop,
+Return false and the next Player if the bets continue
+Return true and the player who bet if the bet was invalid
+*/
+func PlayRound(game Game, bet Bet) (bool, Player, error){
+	if (bet.DiceOccurence==-1 && bet.DiceValue==-1){
+		return true ,endRound(game.CurrentPlayer, getPreviousPlayer(game.Players, game.CurrentPlayer)), nil
+	}
+	err := CheckBet(game.LastBet, bet)
+	if err != nil {
+		game.LastBet=bet
+		return false, getNextPlayer(game.Players, game.CurrentPlayer), nil
+	} else{
+		return true, game.CurrentPlayer, err
+	}
+
+}
+
+
+func FindPlayerIndex(players []Player, p Player) int {
+    for i, n := range players {
+        if p.ID == n.ID {
+            return i
+        }
+    }
+    return -1
 }
