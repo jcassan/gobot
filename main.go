@@ -11,6 +11,7 @@ import (
 	"flag"
 	"sort"
 	"math/rand"
+	"errors"
 )
 
 // Variables used for command line parameters
@@ -105,6 +106,19 @@ func createGame(players []Player) Game{
 	game.CurrentPlayer=game.Players[0]
 	rollDices(game.Players)
 	return game
+}
+
+func checkBet(lastBet Bet, newBet Bet) error{
+	if (newBet.DiceValue > 6 || newBet.DiceValue < 0){
+		return errors.New("Dice value lower than 0 or greater than 6")
+	}
+	if (newBet.DiceValue > lastBet.DiceValue && newBet.DiceOccurence == lastBet.DiceOccurence){
+		return nil
+	}
+	if (newBet.DiceValue == lastBet.DiceValue && newBet.DiceOccurence > lastBet.DiceOccurence){
+		return nil
+	}
+	return errors.New("Incorrect Bet")
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
