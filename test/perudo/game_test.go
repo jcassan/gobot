@@ -12,8 +12,11 @@ func TestCreateGame(t *testing.T) {
 		{Name: "Tata1"},
 		{Name: "Tata2"},
 	}
-	var game, player = perudo.CreateGame(players)
+	var game, nextPlayer = perudo.CreateGame(players)
 	if len(game.Players) != 4 {
-		t.Errorf("Player count invalid. Actual value : %d, Expected value : 4.", len(game.Players))
+		t.Errorf("Player count invalid, expected: 4, got %d.", len(game.Players))
+	}
+	if nextPlayer.Name != "Tata1" {
+		t.Errorf("Next payer invalid, expected: 'Tata1', got \"%s\".", nextPlayer.Name)
 	}
 }

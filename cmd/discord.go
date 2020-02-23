@@ -1,4 +1,4 @@
-package discord
+package main
 
 import (
 	"flag"
@@ -15,12 +15,12 @@ var Token string
 
 //Specific types for Discord
 type DiscordPlayer struct {
-	Player
+	perudo.Player
 	PrivateChannel string
 }
 
 type DiscordGame struct {
-	Game
+	perudo.Game
 	GameChannel string
 }
 
