@@ -60,7 +60,7 @@ func CreateGame(players []Player) (Game, Player) {
 
 func CheckBet(lastBet Bet, newBet Bet) error {
 	if newBet.DiceValue > 6 || newBet.DiceValue < 0 {
-		return errors.New("Dice value lower than 0 or greater than 6")
+		return errors.New("dice value lower than 0 or greater than 6")
 	}
 	if newBet.DiceValue > lastBet.DiceValue && newBet.DiceOccurence == lastBet.DiceOccurence {
 		return nil
@@ -68,7 +68,7 @@ func CheckBet(lastBet Bet, newBet Bet) error {
 	if newBet.DiceValue == lastBet.DiceValue && newBet.DiceOccurence > lastBet.DiceOccurence {
 		return nil
 	}
-	return errors.New("Incorrect Bet")
+	return errors.New("incorrect bet")
 }
 
 func getPreviousPlayer(players []Player, currentPlayer Player) Player {
