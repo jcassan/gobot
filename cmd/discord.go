@@ -6,6 +6,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"os"
 	"os/signal"
+	"perubot/pkg/perudo"
 	"syscall"
 )
 
@@ -62,4 +63,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Content == "pong" {
 		s.ChannelMessageSend(m.ChannelID, "Ping!")
 	}
+
+	perudo.CreateGame(nil)
 }
