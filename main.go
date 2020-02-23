@@ -87,7 +87,6 @@ func main() {
 
 func rollDices(players []Player){
 	for i:=0; i < len(players); i++ {
-
 		players[i].Dices=make([]int, players[i].DicesCount)
 		for j:=0; j < players[i].DicesCount; j++ {
 			players[i].Dices[j]=rand.Intn(5)+1
@@ -95,7 +94,7 @@ func rollDices(players []Player){
 	}
 }
 
-func createGame(players []Player){
+func createGame(players []Player) Game{
 	sort.Slice(players, func(i, j int) bool {
 		return players[i].Name < players[j].Name
 	})
@@ -105,6 +104,7 @@ func createGame(players []Player){
 	}
 	game.CurrentPlayer=game.Players[0]
 	rollDices(game.Players)
+	return game
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
