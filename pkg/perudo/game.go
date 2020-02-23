@@ -30,17 +30,6 @@ type Game struct {
 	LastBet       Bet
 }
 
-//Specific types for Discord
-type DiscordPlayer struct {
-	Player
-	PrivateChannel string
-}
-
-type DiscordGame struct {
-	Game
-	GameChannel string
-}
-
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the autenticated bot has access to.
 
@@ -113,8 +102,23 @@ func getNextPlayer(players []Player, currentPlayer Player) Player{
 	return players[i]
 }
 
-func endRound(currentPlayer Player, previousPlayer Player) Player{
-	return currentPlayer
+//return the player who lost the round
+func endRound(game Game) Player{
+	//Count total number of DiceValue in the round
+	var DiceCounter int = 0
+	for i:=0 ; i < len(game.Players) ; i++{
+		if (game.Players[i].IsEliminated == false){
+			for j:=0 ; j < game.Players[i].DicesCount; j++{
+				if (game.LastBet.DiceValue == game.Players[i].Dices[j]){
+					DiceCounter++
+				}
+			}
+		}
+	}
+	if game.LastBet.DiceOccurence > DiceCounter{
+		return game.CurrentPlayer
+	}
+	return getPreviousPlayer(game.Players, game.CurrentPlayer)
 }
 
 /*
@@ -125,12 +129,13 @@ Return true and the player who bet if the bet was invalid
 */
 func PlayRound(game Game, bet Bet) (bool, Player, error){
 	if (bet.DiceOccurence==-1 && bet.DiceValue==-1){
-		return true ,endRound(game.CurrentPlayer, getPreviousPlayer(game.Players, game.CurrentPlayer)), nil
+		return true ,endRound(game), nil
 	}
 	err := CheckBet(game.LastBet, bet)
 	if err != nil {
 		game.LastBet=bet
-		return false, getNextPlayer(game.Players, game.CurrentPlayer), nil
+		game.CurrentPlayer=getNextPlayer(game.Players, game.CurrentPlayer)
+		return false, game.CurrentPlayer, nil
 	} else{
 		return true, game.CurrentPlayer, err
 	}

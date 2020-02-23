@@ -13,6 +13,17 @@ import (
 // Variables used for command line parameters
 var Token string
 
+//Specific types for Discord
+type DiscordPlayer struct {
+	Player
+	PrivateChannel string
+}
+
+type DiscordGame struct {
+	Game
+	GameChannel string
+}
+
 func init() {
 	flag.StringVar(&Token, "t", "", "Bot Token")
 	flag.Parse()
