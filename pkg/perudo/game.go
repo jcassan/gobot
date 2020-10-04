@@ -11,7 +11,7 @@ import (
 // Generic types for Perudooooooooo 
 type Player struct {
 	gorm.Model
-	ID           int
+	ID           string
 	Name         string
 	Dices        []int
 	DicesCount   int
@@ -52,9 +52,7 @@ func CreateGame(players []Player) (Game, Player) {
 	}
 	game.CurrentPlayer = game.Players[0]
 	RollDices(game.Players)
-	for i := 0; i < len(game.Players); i++ {
-		game.Players[i].ID = i + 1
-	}
+	
 	return game, game.Players[0]
 }
 

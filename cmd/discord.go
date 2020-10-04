@@ -3,31 +3,45 @@ package main
 import (
 	"flag"
 	"fmt"
+	"strings"
 	"github.com/bwmarrin/discordgo"
 	"os"
 	"os/signal"
 	"perubot/pkg/perudo"
 	"syscall"
 )
-
+var games map[string]DiscordGame 
 // Variables used for command line parameters
 var Token string
 
 //Specific types for Discord
 type DiscordPlayer struct {
-	perudo.Player
+	player perudo.Player
 	PrivateChannel string
 }
 
 type DiscordGame struct {
-	perudo.Game
-	GameChannel string
+	game perudo.Game
+//	GameChannel string
 }
 
 func init() {
 	flag.StringVar(&Token, "t", "", "Bot Token")
 	flag.Parse()
 	fmt.Println(Token)
+}
+
+func convertMentions(users []*discordgo.User) []DiscordPlayer {
+	var players []DiscordPlayer
+	for _, u := range users {
+		var player DiscordPlayer = DiscordPlayer{}
+		player.player.ID = u.ID
+		player.player.Name = u.Username
+		player.PrivateChannel = ""
+		players = append(players, player)
+	}
+
+	return players
 }
 
 func main() {
@@ -75,5 +89,22 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(m.ChannelID, "Ping!")
 	}
 
-	perudo.CreateGame(nil)
+	if strings.HasPrefix(m.Content, "start"){
+		var users []*discordgo.User = m.Mentions
+		games = make(map[string]DiscordGame)
+
+		var discordPlayers []DiscordPlayer = convertMentions(users)
+		var perudoPlayers []perudo.Player
+		for _, p := range discordPlayers {
+			perudoPlayers = append(perudoPlayers, p.player)
+		}
+		var game, firstPlayer = perudo.CreateGame(perudoPlayers)
+
+		games[m.ChannelID] = DiscordGame{
+			game: game,
+		}
+		
+		s.ChannelMessageSend(m.ChannelID, firstPlayer.Name)
+	}
+
 }
